@@ -3,7 +3,6 @@ import threading
 import uvicorn
 
 from config.settings import load_settings
-from clients.http_client import WebhookClient
 from clients.mqtt_client import MQTTClient
 from handlers.message_handler import MessageHandler
 from services.mqtt_forwarder import MqttForwarderService
@@ -16,9 +15,8 @@ def main() -> None:
     logger = setup_logging()
     settings = load_settings()
 
-    webhook_client = WebhookClient(settings.webhook_base_url, logger)
     ws_hub = WebSocketHub(logger)
-    handler = MessageHandler(webhook_client, logger, ws_hub)
+    handler = MessageHandler(logger, ws_hub)
     mqtt_client = MQTTClient(settings, handler, logger)
 
     service = MqttForwarderService(mqtt_client, logger)

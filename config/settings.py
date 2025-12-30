@@ -16,7 +16,6 @@ class Settings:
     mqtt_client_id: str
     mqtt_keep_alive: int
     mqtt_topic: str
-    webhook_base_url: str
     ws_host: str
     ws_port: int
 
@@ -38,7 +37,6 @@ def load_settings() -> Settings:
     mqtt_client_id = _get_required("MQTT_CLIENT_ID")
     mqtt_keep_alive = int(_get_required("MQTT_KEEP_ALIVE"))
     mqtt_topic = _get_required("MQTT_TOPIC")
-    webhook_base_url = _get_required("WEBHOOK_BASE_URL")
     ws_host = os.getenv("WS_HOST") or "0.0.0.0"
     ws_port = int(os.getenv("WS_PORT") or "8000")
 
@@ -50,7 +48,6 @@ def load_settings() -> Settings:
         mqtt_client_id=mqtt_client_id,
         mqtt_keep_alive=mqtt_keep_alive,
         mqtt_topic=mqtt_topic,
-        webhook_base_url=webhook_base_url,
         ws_host=ws_host,
         ws_port=ws_port,
     )
