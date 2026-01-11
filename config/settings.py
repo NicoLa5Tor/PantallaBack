@@ -18,6 +18,9 @@ class Settings:
     mqtt_topic: str
     ws_host: str
     ws_port: int
+    backend_base_url: Optional[str]
+    backend_token: Optional[str]
+    backend_token_header: Optional[str]
 
 
 def _get_required(name: str) -> str:
@@ -39,6 +42,9 @@ def load_settings() -> Settings:
     mqtt_topic = _get_required("MQTT_TOPIC")
     ws_host = os.getenv("WS_HOST") or "0.0.0.0"
     ws_port = int(os.getenv("WS_PORT") or "8000")
+    backend_base_url = os.getenv("BACKEND_BASE_URL") or None
+    backend_token = os.getenv("BACKEND_INTERNAL_TOKEN") or None
+    backend_token_header = os.getenv("BACKEND_INTERNAL_TOKEN_HEADER") or "INTERNAL_TOKEN_HEADER"
 
     return Settings(
         mqtt_broker=mqtt_broker,
@@ -50,4 +56,7 @@ def load_settings() -> Settings:
         mqtt_topic=mqtt_topic,
         ws_host=ws_host,
         ws_port=ws_port,
+        backend_base_url=backend_base_url,
+        backend_token=backend_token,
+        backend_token_header=backend_token_header,
     )
