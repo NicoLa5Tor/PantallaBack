@@ -19,6 +19,7 @@ class Settings:
     ws_host: str
     ws_port: int
     backend_base_url: Optional[str]
+    backend_status_url: Optional[str]
     backend_token: Optional[str]
     backend_token_header: Optional[str]
 
@@ -43,8 +44,13 @@ def load_settings() -> Settings:
     ws_host = os.getenv("WS_HOST") or "0.0.0.0"
     ws_port = int(os.getenv("WS_PORT") or "8000")
     backend_base_url = os.getenv("BACKEND_BASE_URL") or None
-    backend_token = os.getenv("BACKEND_INTERNAL_TOKEN") or None
-    backend_token_header = os.getenv("BACKEND_INTERNAL_TOKEN_HEADER") or "INTERNAL_TOKEN_HEADER"
+    backend_status_url = os.getenv("BACKEND_STATUS_URL") or None
+    backend_token = os.getenv("BACKEND_INTERNAL_TOKEN") or os.getenv("BACKEND_STATUS_TOKEN") or None
+    backend_token_header = (
+        os.getenv("BACKEND_INTERNAL_TOKEN_HEADER")
+        or os.getenv("BACKEND_STATUS_TOKEN_HEADER")
+        or "INTERNAL_TOKEN_HEADER"
+    )
 
     return Settings(
         mqtt_broker=mqtt_broker,
@@ -57,6 +63,7 @@ def load_settings() -> Settings:
         ws_host=ws_host,
         ws_port=ws_port,
         backend_base_url=backend_base_url,
+        backend_status_url=backend_status_url,
         backend_token=backend_token,
         backend_token_header=backend_token_header,
     )

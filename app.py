@@ -37,12 +37,13 @@ app.add_event_handler("startup", _start_mqtt)
 
 def _build_backend_client() -> BackendClient | None:
     if (
-        settings.backend_base_url
+        (settings.backend_base_url or settings.backend_status_url)
         and settings.backend_token
         and settings.backend_token_header
     ):
         return BackendClient(
             settings.backend_base_url,
+            settings.backend_status_url,
             settings.backend_token_header,
             settings.backend_token,
             logger,
@@ -50,10 +51,11 @@ def _build_backend_client() -> BackendClient | None:
     if any(
         [
             settings.backend_base_url,
+            settings.backend_status_url,
             settings.backend_token,
         ]
     ):
         logger.warning(
-            "Backend status forwarding disabled; missing BACKEND_BASE_URL/BACKEND_INTERNAL_TOKEN"
+            "Backend status forwarding disabled; missing BACKEND_BASE_URL or BACKEND_STATUS_URL/BACKEND_INTERNAL_TOKEN"
         )
     return None

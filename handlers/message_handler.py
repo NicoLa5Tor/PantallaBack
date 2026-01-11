@@ -23,6 +23,10 @@ class MessageHandler:
         self._backend_client = backend_client
 
     def handle(self, topic: str, payload: bytes) -> None:
+        topic_parts = _split_topic(topic)
+        if not _is_empresas_topic(topic_parts):
+            return
+
         text = payload.decode("utf-8", errors="replace")
         self._logger.info("MQTT message received topic=%s payload=%s", topic, text)
 
@@ -34,27 +38,33 @@ class MessageHandler:
                 self._ws_publisher.publish(topic, outbound_payload)
             return
 
-        if _is_status_topic(topic) and self._backend_client is not None:
-            base_topic = _strip_status_suffix(topic)
+        if _is_status_topic(topic_parts) and self._backend_client is not None:
+            base_topic = _strip_status_suffix(topic_parts)
             if base_topic:
                 self._backend_client.send_physical_status(base_topic, outbound_payload)
 
 
 def _is_pantalla_topic(topic: str) -> bool:
-    segments = topic.split("/")
-    return "PANTALLA" in segments
+    segments = _split_topic(topic)
+    return _is_empresas_topic(segments) and "PANTALLA" in segments
 
 
-def _is_status_topic(topic: str) -> bool:
-    segments = topic.split("/")
-    return bool(segments) and segments[-1] == "status"
+def _is_status_topic(segments: list[str]) -> bool:
+    return _is_empresas_topic(segments) and segments[-1] == "status"
 
 
-def _strip_status_suffix(topic: str) -> str:
-    segments = topic.split("/")
+def _is_empresas_topic(segments: list[str]) -> bool:
+    return bool(segments) and segments[0] == "empresas"
+
+
+def _strip_status_suffix(segments: list[str]) -> str:
     if not segments or segments[-1] != "status":
-        return topic
+        return "/".join(segments)
     return "/".join(segments[:-1])
+
+
+def _split_topic(topic: str) -> list[str]:
+    return [segment for segment in topic.split("/") if segment]
 
 
 def _try_parse_json(text: str) -> Optional[Any]:
